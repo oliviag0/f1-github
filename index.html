@@ -1,9 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>F1 Countdown</title>
-</head>
 <body>
   <h1>Next Race Countdown</h1>
+  <div id="race-info">Loading...</div>
+
+  <script>
+    fetch('https://api.jolpi.ca/ergast/f1/current/next.json')
+      .then(response => response.json())
+      .then(data => {
+        const race = data.MRData.RaceTable.Races[0];
+        document.getElementById('race-info').textContent =
+          `${race.raceName} — ${race.date}`;
+      })
+      .catch(error => {
+        document.getElementById('race-info').textContent = 'Failed to load race data.';
+      });
+  </script>
 </body>
-</html>
