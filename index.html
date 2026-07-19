@@ -1,17 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>F1 Countdown</title>
+</head>
 <body>
   <h1>Next Race Countdown</h1>
   <div id="race-info">Loading...</div>
+  <h2>Driver Standings</h2>
+  <ol id="standings">Loading...</ol>
+  <h2>Last Race Results</h2>
+  <ol id="results">Loading...</ol>
 
   <script>
     fetch('https://api.jolpi.ca/ergast/f1/current/next.json')
       .then(response => response.json())
       .then(data => {
         const race = data.MRData.RaceTable.Races[0];
+        const daysUntil = Math.ceil((new Date(race.date) - new Date()) / (1000 * 60 * 60 * 24));
+
         document.getElementById('race-info').textContent =
-          `${race.raceName} — ${race.date}`;
+          `${race.raceName} — ${race.date} (${daysUntil} days to go)`;
       })
       .catch(error => {
         document.getElementById('race-info').textContent = 'Failed to load race data.';
       });
   </script>
+  <script>
+    fetch('https://api.jolpi.ca/ergast/f1/current/driverStandings.json')
+      .then(response => response.json())
+      .then(data => {
+        const standings = data.MRData.StandingsTable.StandingsLists[0].DriverStandings;
+        const list = document.getElementById('standings');
+        list.innerHTML = '';
+        standings.forEach(entry => {
+          const li = document.createElement('li');
+          li.textContent = `${entry.Driver.givenName} ${entry.Driver.familyName} — ${entry.points} pts`;
+          list.appendChild(li);
+        });
+      })
+      .catch(error => {
+        document.getElementById('standings').textContent = 'Failed to load standings.';
+      });
+  </script>
+
+  <script>
+    fetch('https://api.jolpi.ca/ergast/f1/current/last/results.json')
+      .then(response => response.json())
+      .then(data => {
+        const results = data.MRData.RaceTable.Races[0].Results;
+        const list = document.getElementById('results');
+        list.innerHTML = '';
+        results.forEach(entry => {
+          const li = document.createElement('li');
+          li.textContent = `${entry.Driver.givenName} ${entry.Driver.familyName} — ${entry.position} (${entry.points} pts)`;
+          list.appendChild(li);
+        });
+      })
+      .catch(error => {
+        document.getElementById('results').textContent = 'Failed to load results.';
+      });
+  </script>
+
 </body>
+</html>
