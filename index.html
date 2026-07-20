@@ -2,13 +2,74 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>F1 Race Tracker</title>
+  <title>F1 Countdown</title>
+  <style>
+    body {
+      background: #15151e;
+      color: #f5f5f5;
+      font-family: -apple-system, "Segoe UI", sans-serif;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    h1 {
+      color: #e10600;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    h2 {
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #999;
+      margin-top: 40px;
+      margin-bottom: 12px;
+    }
+    #race-info {
+      background: #1f1f2b;
+      border-left: 4px solid #e10600;
+      padding: 16px 20px;
+      border-radius: 6px;
+      font-size: 18px;
+    }
+    ol {
+      list-style: none;
+      padding: 0;
+      counter-reset: item;
+    }
+    ol li {
+      counter-increment: item;
+      background: #1f1f2b;
+      margin-bottom: 6px;
+      padding: 12px 16px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+    }
+    ol li::before {
+      content: counter(item);
+      background: #e10600;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+  </style>
 </head>
 <body>
-  <h1>Upcoming F1 Race</h1>
+  <h1>Next Race Countdown</h1>
   <div id="race-info">Loading...</div>
+
   <h2>Driver Standings</h2>
   <ol id="standings">Loading...</ol>
+
   <h2>Last Race Results</h2>
   <ol id="results">Loading...</ol>
 
@@ -18,15 +79,13 @@
       .then(data => {
         const race = data.MRData.RaceTable.Races[0];
         const daysUntil = Math.ceil((new Date(race.date) - new Date()) / (1000 * 60 * 60 * 24));
-
         document.getElementById('race-info').textContent =
           `${race.raceName} — ${race.date} (${daysUntil} days to go)`;
       })
       .catch(error => {
         document.getElementById('race-info').textContent = 'Failed to load race data.';
       });
-  </script>
-  <script>
+
     fetch('https://api.jolpi.ca/ergast/f1/current/driverStandings.json')
       .then(response => response.json())
       .then(data => {
@@ -42,9 +101,7 @@
       .catch(error => {
         document.getElementById('standings').textContent = 'Failed to load standings.';
       });
-  </script>
 
-  <script>
     fetch('https://api.jolpi.ca/ergast/f1/current/last/results.json')
       .then(response => response.json())
       .then(data => {
@@ -53,7 +110,7 @@
         list.innerHTML = '';
         results.forEach(entry => {
           const li = document.createElement('li');
-          li.textContent = `${entry.Driver.givenName} ${entry.Driver.familyName} — ${entry.position} (${entry.points} pts)`;
+          li.textContent = `${entry.Driver.givenName} ${entry.Driver.familyName} — ${entry.points} pts`;
           list.appendChild(li);
         });
       })
@@ -61,6 +118,5 @@
         document.getElementById('results').textContent = 'Failed to load results.';
       });
   </script>
-
 </body>
 </html>
