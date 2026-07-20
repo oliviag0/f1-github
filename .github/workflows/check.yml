@@ -1,0 +1,14 @@
+name: Check site files
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Confirm index.html exists
+        run: test -f index.html && echo "index.html found ✅"
